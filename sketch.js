@@ -30,6 +30,7 @@ const STATE_START = "start";
 const STATE_PLAY = "play";
 const STATE_WIN = "win";
 const STATE_OVER = "over";
+let debugMode = false;
 
 let gameState = STATE_START;
 let currentLevel = 1;
@@ -113,6 +114,10 @@ function draw() {
     drawWinScreen();
   } else if (gameState === STATE_OVER) {
     drawGameOver();
+  }
+
+  if (debugMode) {
+    drawDebugPanel();
   }
 }
 
@@ -480,6 +485,59 @@ function drawGameOver() {
   text("Click to try again", width / 2, height / 2 + 40);
 }
 
+// ------------------------------------------------------------
+// drawDebugPanel()
+// Semi-transparent overlay listing keyboard shortcuts and
+// current game state. Toggled with D.
+// ------------------------------------------------------------
+function drawDebugPanel() {
+  push();
+
+  // Panel background
+  let panelW = 230;
+  let panelH = 190;
+  let panelX = width - panelW - 10;
+  let panelY = 10;
+
+  fill(0, 0, 0, 200);
+  stroke(80, 200, 255);
+  strokeWeight(1.5);
+  rect(panelX, panelY, panelW, panelH, 8);
+
+  noStroke();
+  textAlign(LEFT);
+  textFont("monospace");
+
+  fill(80, 200, 255);
+  textSize(14);
+  text("DEBUG PANEL (D)", panelX + 12, panelY + 22);
+
+  fill(220);
+  textSize(12);
+  let lineY = panelY + 46;
+  let lineGap = 16;
+
+  text("1 / 2 / 3 — jump to level", panelX + 12, lineY);
+  lineY += lineGap;
+  text("S — start screen", panelX + 12, lineY);
+  lineY += lineGap;
+  text("W — win screen", panelX + 12, lineY);
+  lineY += lineGap;
+  text("O — game over screen", panelX + 12, lineY);
+  lineY += lineGap + 6;
+
+  fill(255, 220, 80);
+  text("State: " + gameState, panelX + 12, lineY);
+  lineY += lineGap;
+  text("Level: " + currentLevel, panelX + 12, lineY);
+  lineY += lineGap;
+  text("Score: " + score + " / " + targetScore, panelX + 12, lineY);
+  lineY += lineGap;
+  text("Total: " + totalScore, panelX + 12, lineY);
+
+  pop();
+}
+
 // ============================================================
 // INPUT
 // ============================================================
@@ -517,7 +575,35 @@ function mousePressed() {
 // Use key === "s" or "w" to jump to start or win screens.
 // ------------------------------------------------------------
 function keyPressed() {
-  // YOUR DEBUG CODE GOES HERE
+  // Toggle the debug panel
+  if (key === "d" || key === "D") {
+    debugMode = !debugMode;
+    return;
+  }
+
+  // Jump directly to a level
+  if (key === "1") {
+    totalScore = 0;
+    loadLevel(1);
+    gameState = STATE_PLAY;
+  } else if (key === "2") {
+    totalScore = 0;
+    loadLevel(2);
+    gameState = STATE_PLAY;
+  } else if (key === "3") {
+    totalScore = 0;
+    loadLevel(3);
+    gameState = STATE_PLAY;
+  }
+
+  // Jump to start / win / game over screens
+  if (key === "s" || key === "S") {
+    gameState = STATE_START;
+  } else if (key === "w" || key === "W") {
+    gameState = STATE_WIN;
+  } else if (key === "o" || key === "O") {
+    gameState = STATE_OVER;
+  }
 }
 
 // ------------------------------------------------------------
